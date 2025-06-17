@@ -101,7 +101,7 @@ const dm = {
   constellation4: {
     impact_dmgInc: skillParam_gen.constellation4[0],
     max_dmgInc: skillParam_gen.constellation4[1],
-    burst_dmg_: skillParam_gen.constellation4[2],
+    fpBurstVolcano_dmg_: skillParam_gen.constellation4[2],
     duration: 15,
   },
   constellation6: {
@@ -171,11 +171,12 @@ const c4Diligent_impact_dmgInc = greaterEq(
   { path: 'plunging_impact_dmgInc' }
 )
 const [condC4FpApexPath, condC4FpApex] = cond(key, 'c4FpApex')
-const c4FpApex_burst_dmg_ = greaterEq(
+const c4FpApex_volcano_dmg_ = greaterEq(
   input.constellation,
   4,
-  equal(condC4FpApex, 'on', dm.constellation4.burst_dmg_)
+  equal(condC4FpApex, 'on', dm.constellation4.fpBurstVolcano_dmg_)
 )
+const c4FpApex_fpBurst_dmg_ = { ...c4FpApex_volcano_dmg_ }
 
 const c6_plunging_critRate_ = greaterEq(
   input.constellation,
@@ -242,6 +243,7 @@ const dmgFormulas = {
             1,
             a1Rainbow_fpImpact_dmgInc
           ),
+          plunging_dmg_: c4FpApex_volcano_dmg_,
         },
       },
       undefined,
@@ -266,7 +268,6 @@ export const data = dataObjForCharacterSheet(key, dmgFormulas, {
     burstBoost: burstC3,
     atk_: a4NsBurst_atk_,
     plunging_impact_dmgInc: c4Diligent_impact_dmgInc,
-    burst_dmg_: c4FpApex_burst_dmg_,
     burst_critRate_: c6_burst_critRate_,
     burst_critDMG_: c6_burst_critDMG_,
     plunging_critRate_: c6_plunging_critRate_,
@@ -532,7 +533,16 @@ const sheet: TalentSheet = {
         on: {
           fields: [
             {
-              node: c4FpApex_burst_dmg_,
+              node: infoMut(c4FpApex_fpBurst_dmg_, {
+                name: ct.ch('fpBurst_dmg_'),
+                unit: '%',
+              }),
+            },
+            {
+              node: infoMut(c4FpApex_volcano_dmg_, {
+                name: ct.ch('volcano_dmg_'),
+                unit: '%',
+              }),
             },
           ],
         },
